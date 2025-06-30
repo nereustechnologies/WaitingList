@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Select } from "@/components/ui/select"
+import { SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
+
 
 export default function Component() {
   const formRef = useRef<HTMLFormElement>(null)
@@ -13,6 +16,8 @@ export default function Component() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle")
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [selectedCity, setSelectedCity] = useState("")
+const [otherCity, setOtherCity] = useState("")
 
   const validateInputs = (data: {
     fullName: string
@@ -53,7 +58,8 @@ export default function Component() {
     fullName: formData.get("fullName") as string,
     phoneNumber: formData.get("phoneNumber") as string,
     email: formData.get("email") as string,
-    city: formData.get("city") as string,
+    city: selectedCity === "Other" ? otherCity : selectedCity,
+
   }
 
   const validationError = validateInputs(data)
@@ -108,16 +114,19 @@ export default function Component() {
               lineHeight:'4rem'
             }}
           >
-            Welcome to Nereus Technologies.
+            Built for the ones who move different
           </h1>
     </div>
 
     {/* Right section: Form */}
     <Card className="w-full bg-gray-900 border-gray-800 shadow-2xl">
       <CardHeader className="text-center pt-8 pb-4 px-6 sm:px-8">
-        <CardTitle className="text-2xl sm:text-3xl font-bold text-white mb-2">Join the Waiting List</CardTitle>
+        <CardTitle className="text-2xl sm:text-3xl font-bold text-white mb-2"  style={{
+              fontFamily: "Gerante",
+              lineHeight:'4rem'
+            }}>Join the Waiting List</CardTitle>
         <CardDescription className="text-gray-400 text-sm sm:text-base">
-          Be the first to know when we launch.
+        
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6 px-6 sm:px-8 pb-8">
@@ -152,10 +161,34 @@ export default function Component() {
             <Input id="email" name="email" type="email" placeholder="name@example.com" required className="bg-gray-800 border-gray-700 text-white" />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="city" className="text-white font-medium">City</Label>
-            <Input id="city" name="city" type="text" placeholder="Your city" required className="bg-gray-800 border-gray-700 text-white" />
-          </div>
+        <div className="space-y-2">
+  <Label htmlFor="city" className="text-white font-medium">City</Label>
+  <Select onValueChange={setSelectedCity}>
+    <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+      <SelectValue placeholder="Select your city" />
+    </SelectTrigger>
+    <SelectContent className="bg-gray-800 text-white">
+      <SelectItem value="Bengaluru">Bengaluru</SelectItem>
+      <SelectItem value="Chennai">Chennai</SelectItem>
+      <SelectItem value="Hyderabad">Hyderabad</SelectItem>
+      <SelectItem value="Mumbai">Mumbai</SelectItem>
+      <SelectItem value="Delhi">Delhi</SelectItem>
+      <SelectItem value="Calcutta">Calcutta</SelectItem>
+      <SelectItem value="Other">Other</SelectItem>
+    </SelectContent>
+  </Select>
+
+  {selectedCity === "Other" && (
+    <Input
+      type="text"
+      placeholder="Enter your city"
+      value={otherCity}
+      onChange={(e) => setOtherCity(e.target.value)}
+      className="bg-gray-800 border-gray-700 text-white mt-2"
+      required
+    />
+  )}
+</div>
 
           <Button
             onClick={handleSubmit}
