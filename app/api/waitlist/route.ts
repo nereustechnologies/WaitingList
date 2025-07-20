@@ -26,28 +26,40 @@ export async function POST(req: Request) {
     const phoneNumber = raw.phoneNumber?.trim()
     const email = raw.email?.trim().toLowerCase()
     const city = raw.city?.trim()
+    const heardFrom = raw.heardFrom?.trim()
+    const gymName = raw.gymName?.trim()
+    const otherSource = raw.otherSource?.trim()
 
     if (!fullName || !phoneNumber || !email || !city) {
-      return NextResponse.json({ error: "All fields are required" }, { status: 401 })
+      return NextResponse.json({ error: "All fields are required." }, { status: 400 })
     }
 
     if (!isValidName(fullName)) {
-      return NextResponse.json({ error: "Invalid name" }, { status: 402 })
+      return NextResponse.json({ error: "Invalid name." }, { status: 400 })
     }
 
     if (!isValidPhone(phoneNumber)) {
-      return NextResponse.json({ error: "Invalid phone number" }, { status: 403 })
+      return NextResponse.json({ error: "Invalid phone number." }, { status: 400 })
     }
 
     if (!isValidEmail(email)) {
-      return NextResponse.json({ error: "Invalid email address" }, { status: 405 })
+      return NextResponse.json({ error: "Invalid email address." }, { status: 400 })
     }
 
     if (!isValidCity(city)) {
-      return NextResponse.json({ error: "Invalid city name" }, { status: 406 })
+      return NextResponse.json({ error: "Invalid city name." }, { status: 400 })
     }
 
-    // Check for duplicates
+    // Validate gym/other details if required
+    if (heardFrom === "Gym / Club" && (!gymName || gymName.length < 2)) {
+      return NextResponse.json({ error: "Please enter gym/club name." }, { status: 400 })
+    }
+
+    if (heardFrom === "Other" && (!otherSource || otherSource.length < 2)) {
+      return NextResponse.json({ error: "Please specify how you heard about us." }, { status: 400 })
+    }
+
+    // Check duplicates
     const existing = await prisma.waitlistEntry.findFirst({
       where: {
         OR: [{ phoneNumber }, { email }],
@@ -58,15 +70,23 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "You’ve already joined the waitlist." }, { status: 409 })
     }
 
-    // Save to DB
-    const newEntry = await prisma.waitlistEntry.create({
-      data: { fullName, phoneNumber, email, city },
+    // Create waitlist entry
+    const entry = await prisma.waitlistEntry.create({
+      data: {
+        fullName,
+        phoneNumber,
+        email,
+        city,
+        heardFrom,
+        gymName,
+        otherSource,
+      },
     })
 
-    return NextResponse.json({ message: "Added to waitlist", data: newEntry }, { status: 200 })
+    return NextResponse.json({ message: "Added to waitlist", data: entry }, { status: 200 })
 
   } catch (error) {
     console.error("Error saving waitlist entry:", error)
-    return NextResponse.json({ error: "Server error" }, { status: 500 })
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
   }
 }

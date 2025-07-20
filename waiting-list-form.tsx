@@ -24,6 +24,10 @@ export default function Component() {
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle")
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [selectedCity, setSelectedCity] = useState("")
+  const [heardFrom, setHeardFrom] = useState("");
+const [gymName, setGymName] = useState("");
+const [otherSource, setOtherSource] = useState("");
+  
   const [otherCity, setOtherCity] = useState("")
 
   const validateInputs = (data: {
@@ -43,6 +47,13 @@ export default function Component() {
   const handleSubmit = async () => {
     if (!formRef.current) return
 
+    if ((heardFrom === "Gym / Club" && !gymName.trim()) ||
+    (heardFrom === "Other" && !otherSource.trim())) {
+  alert("Please fill out the required details.");
+  return;
+}
+
+
     setIsSubmitting(true)
     setSubmitStatus("idle")
     setErrorMsg(null)
@@ -52,7 +63,9 @@ export default function Component() {
       fullName: formData.get("fullName") as string,
       phoneNumber: formData.get("phoneNumber") as string,
       email: formData.get("email") as string,
-      city: selectedCity === "Other" ? otherCity : selectedCity
+      city: selectedCity === "Other" ? otherCity : selectedCity,
+        gymName: heardFrom === "Gym / Club" ? gymName : "",
+  otherSource: heardFrom === "Other" ? otherSource : "",
     }
 
     const validationError = validateInputs(data)
@@ -209,6 +222,46 @@ export default function Component() {
                 />
               )}
             </div>
+            <div className="mb-2">
+  <Label className="text-white">How did you hear about Nereus?</Label>
+  <Select onValueChange={setHeardFrom} required>
+    <SelectTrigger className="bg-black/40 text-white border border-gray-700 mt-1">
+      <SelectValue placeholder="Select an option" />
+    </SelectTrigger>
+    <SelectContent className="bg-gray-800 text-white">
+      <SelectItem value="Run Club">Run Club</SelectItem>
+      <SelectItem value="Instagram">Instagram</SelectItem>
+      <SelectItem value="LinkedIn">LinkedIn</SelectItem>
+      <SelectItem value="Word of Mouth">Word of Mouth</SelectItem>
+      <SelectItem value="Live Demo">Live Demo</SelectItem>
+      <SelectItem value="Gym / Club">Gym / Club</SelectItem>
+      <SelectItem value="Other">Other</SelectItem>
+    </SelectContent>
+  </Select>
+
+  {heardFrom === "Gym / Club" && (
+    <Input
+      type="text"
+      placeholder="Enter your gym/club name"
+      value={gymName}
+      onChange={(e) => setGymName(e.target.value)}
+      className="bg-black/40 text-white border border-gray-700 mt-2 mb-2"
+      required
+    />
+  )}
+
+  {heardFrom === "Other" && (
+    <Input
+      type="text"
+      placeholder="Please specify"
+      value={otherSource}
+      onChange={(e) => setOtherSource(e.target.value)}
+      className="bg-black/40 text-white border border-gray-700 mt-2 mb-2"
+      required
+    />
+  )}
+</div>
+
 
             <Button
               onClick={handleSubmit}

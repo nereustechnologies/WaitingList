@@ -16,7 +16,7 @@ import {
   DialogTrigger,
   DialogContent,
   DialogHeader,
-    DialogTitle
+  DialogTitle
 } from "@/components/ui/dialog"
 
 export default function MobileComponent() {
@@ -26,6 +26,9 @@ export default function MobileComponent() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [selectedCity, setSelectedCity] = useState("")
   const [otherCity, setOtherCity] = useState("")
+  const [heardFrom, setHeardFrom] = useState("")
+  const [gymName, setGymName] = useState("")
+  const [otherSource, setOtherSource] = useState("")
 
   const validateInputs = (data: {
     fullName: string
@@ -38,6 +41,10 @@ export default function MobileComponent() {
     if (!/^[6-9]\d{9}$/.test(phoneNumber)) return "Phone Number must be a valid 10-digit Indian number."
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Invalid email format."
     if (!city.trim() || city.length < 2) return "City name must be at least 2 characters."
+    if ((heardFrom === "Gym / Club" && !gymName.trim()) ||
+        (heardFrom === "Other" && !otherSource.trim())) {
+      return "Please provide the required details for how you heard about us."
+    }
     return null
   }
 
@@ -52,7 +59,10 @@ export default function MobileComponent() {
       fullName: formData.get("fullName") as string,
       phoneNumber: formData.get("phoneNumber") as string,
       email: formData.get("email") as string,
-      city: selectedCity === "Other" ? otherCity : selectedCity
+      city: selectedCity === "Other" ? otherCity : selectedCity,
+      heardFrom,
+      gymName: heardFrom === "Gym / Club" ? gymName : "",
+      otherSource: heardFrom === "Other" ? otherSource : ""
     }
 
     const validationError = validateInputs(data)
@@ -87,55 +97,30 @@ export default function MobileComponent() {
 
   return (
     <div className="relative min-h-screen bg-black text-white flex items-center justify-center">
-      {/* Background Image */}
-      <img
-        src="/sesnor.PNG"
-        alt="Background"
-        className="absolute inset-0 w-full h-full object-cover z-0"
-      />
-         <img
-        src="/log.png"
-        alt="Background"
-        className="absolute z-50 top-4 left-4 h-12 "
-      />
-      
-      
-
-      {/* Overlay */}
+      <img src="/sesnor.PNG" alt="Background" className="absolute inset-0 w-full h-full object-cover z-0" />
+      <img src="/log.png" alt="Logo" className="absolute z-50 top-4 left-4 h-12" />
       <div className="absolute inset-0 bg-black bg-opacity-60 z-10" />
-
-      {/* Hero Content */}
       <div className="relative z-20 text-center px-4">
-        <h1 className="text-md mb-2 font-light"
-         style={{
-            fontFamily:"Gerante"
-         }}
-        >BUILT FOR THOSE WHO MOVE DIFFERENT</h1>
+        <h1 className="text-md mb-2 font-light" style={{ fontFamily: "Gerante" }}>
+          BUILT FOR THOSE WHO MOVE DIFFERENT
+        </h1>
 
-        {/* Join Button + Modal Trigger */}
         <Dialog>
           <DialogTrigger asChild>
-            <Button className="text-white font-bold text-base bg-white/10 border border-white rounded-full px-6 py-3 mt-2 hover:bg-white hover:text-black transition"
-           
-            >
+            <Button className="text-white font-bold text-base bg-white/10 border border-white rounded-full px-6 py-3 mt-2 hover:bg-white hover:text-black transition">
               JOIN THE WAITLIST NOW
             </Button>
           </DialogTrigger>
 
           <DialogContent className="max-w-md w-[95%] bg-white text-black rounded-xl p-6">
-           <DialogHeader>
-  <DialogTitle className="text-xl font-semibold mb-2 text-center">
-    Join The Wait List
-  </DialogTitle>
-</DialogHeader>
+            <DialogHeader>
+              <DialogTitle className="text-xl font-semibold mb-2 text-center">Join The Wait List</DialogTitle>
+            </DialogHeader>
+
             <form ref={formRef} className="space-y-4">
               <div>
                 <Label className="text-sm">Full Name</Label>
-                <Input
-                  name="fullName"
-                  placeholder="Your full name"
-                  required
-                />
+                <Input name="fullName" placeholder="Your full name" required />
               </div>
 
               <div>
@@ -156,12 +141,7 @@ export default function MobileComponent() {
 
               <div>
                 <Label className="text-sm">Email Address</Label>
-                <Input
-                  name="email"
-                  type="email"
-                  placeholder="name@example.com"
-                  required
-                />
+                <Input name="email" type="email" placeholder="name@example.com" required />
               </div>
 
               <div>
@@ -180,7 +160,6 @@ export default function MobileComponent() {
                     <SelectItem value="Other">Other</SelectItem>
                   </SelectContent>
                 </Select>
-
                 {selectedCity === "Other" && (
                   <Input
                     type="text"
@@ -188,6 +167,46 @@ export default function MobileComponent() {
                     value={otherCity}
                     onChange={(e) => setOtherCity(e.target.value)}
                     className="mt-2"
+                  />
+                )}
+              </div>
+
+              <div>
+                <Label className="text-sm">How did you hear about Nereus?</Label>
+                <Select onValueChange={setHeardFrom}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select an option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Run Club">Run Club</SelectItem>
+                    <SelectItem value="Instagram">Instagram</SelectItem>
+                    <SelectItem value="LinkedIn">LinkedIn</SelectItem>
+                    <SelectItem value="Word of Mouth">Word of Mouth</SelectItem>
+                    <SelectItem value="Live Demo">Live Demo</SelectItem>
+                    <SelectItem value="Gym / Club">Gym / Club</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {heardFrom === "Gym / Club" && (
+                  <Input
+                    type="text"
+                    placeholder="Enter your gym/club name"
+                    value={gymName}
+                    onChange={(e) => setGymName(e.target.value)}
+                    className="mt-2"
+                    required
+                  />
+                )}
+
+                {heardFrom === "Other" && (
+                  <Input
+                    type="text"
+                    placeholder="Please specify"
+                    value={otherSource}
+                    onChange={(e) => setOtherSource(e.target.value)}
+                    className="mt-2"
+                    required
                   />
                 )}
               </div>

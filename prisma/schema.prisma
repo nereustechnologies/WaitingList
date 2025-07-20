@@ -11,7 +11,10 @@ model WaitlistEntry {
   id          String   @id @default(cuid())
   fullName    String
   phoneNumber String
-  email       String   @unique
+  email       String  
   city        String
+  heardFrom    String?
+  gymName      String?
+  otherSource  String?
   createdAt   DateTime @default(now())
 }
