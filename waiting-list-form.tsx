@@ -229,7 +229,7 @@ const [otherSource, setOtherSource] = useState("");
       <SelectValue placeholder="Select an option" />
     </SelectTrigger>
     <SelectContent className="bg-gray-800 text-white">
-      <SelectItem value="Run Club">Run Club</SelectItem>
+      <SelectItem value="Run Club">56 Run Club</SelectItem>
       <SelectItem value="Instagram">Instagram</SelectItem>
       <SelectItem value="LinkedIn">LinkedIn</SelectItem>
       <SelectItem value="Word of Mouth">Word of Mouth</SelectItem>
